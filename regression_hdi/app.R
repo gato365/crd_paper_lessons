@@ -96,8 +96,8 @@ ui <- fluidPage(
       br(),
       br(),
       tags$b("Compute parameters in R:"),
-      verbatimTextOutput("summary")#,
-      # reactableOutput("table")
+      verbatimTextOutput("summary"),
+     reactableOutput("table")
     )
   )
 )
@@ -161,8 +161,8 @@ server <- function(input, output) {
       ## Plot Scatter Plot of response and explanatory variable
       p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
                                y = response_variable)) +
-        geom_point(color = 'red',size = 3) +
-        geom_smooth(method = "lm", se = FALSE)  +
+        geom_point(color = 'black',size = 3) +
+        geom_smooth(method = "lm", se = FALSE,color = 'red')  +
         labs(x = explanatory_variable_1,
              y = response_variable,
              title = paste0("Relationship Data \n",explanatory_variable_1," and \n",response_variable)) +

@@ -7,6 +7,7 @@ suppressPackageStartupMessages(library(tidyverse))
 library(ggfortify)
 library(gridExtra)
 library(broom)
+library(reactable)
 
 
 setwd("G:/My Drive/03_research_and_development/01_research_topics/paper_0_CRD_main/lesson_plans/crd_paper_lessons/regression_hdi")
@@ -18,7 +19,7 @@ cn_df = read_xlsx('hdi_2015.xlsx', sheet = 'variables')
 colnames(hdi_df) = cn_df$abbreviations
 ## Clean up data
 hdi_df = hdi_df %>% 
-    select(-contains('HDI'),-Country)
+    select(-contains('HDI'))
 
 
 imp_var_df = cn_df %>% 
@@ -56,7 +57,8 @@ ui <- fluidPage(
         mainPanel(
             plotOutput("distPlot"),
             tags$b("Compute parameters in R:"),
-            verbatimTextOutput("summary")
+            verbatimTextOutput("summary"),
+            DTOutput('tbl')
         )
     )
 )
@@ -81,6 +83,7 @@ server <- function(input, output) {
         explanatory_variable <- inform$exp_var
         response_variable <- inform$resp_var 
         
+        ## Plot Scatter Plot of response and explanatory variable
         ggplot(hdi_df,aes_string(x = explanatory_variable, 
                                     y = response_variable)) +
             geom_point(color = 'red',size = 3) +
@@ -94,23 +97,36 @@ server <- function(input, output) {
     })
 
     
-    
-    
     output$summary <- renderPrint({
-        inform<-inform()
-        
-        explanatory_variable <- inform$exp_var
-        response_variable <- inform$resp_var 
-        
-        f <- as.formula(
-            paste(response_variable, 
-                  paste(explanatory_variable, collapse = " + "), 
-                  sep = " ~ "))
-        
-        
-        
+      inform<-inform()
+      
+      explanatory_variable <- inform$exp_var
+      response_variable <- inform$resp_var 
+      
+      ## Formula for regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(explanatory_variable, collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## Run Regression Model
       summary(lm(f,data = hdi_df))
-        
+      
+    })
+    
+    
+      
+    output$table <- renderReactable({
+      inform<-inform()
+      
+      explanatory_variable <- inform$exp_var
+      response_variable <- inform$resp_var 
+      
+      ## Select Based on user input
+      hdi_df %>%
+        select(explanatory_variable,response_variable) %>% 
+        reactable()
     })
     
     

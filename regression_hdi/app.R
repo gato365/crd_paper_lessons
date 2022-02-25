@@ -2,10 +2,8 @@
 
 library(shiny)
 library(bslib)
-library(MASS)
 suppressPackageStartupMessages(library(tidyverse))
-library(ggfortify)
-library(gridExtra)
+library(readxl)
 library(broom)
 library(reactable)
 
@@ -19,7 +17,7 @@ cn_df = read_xlsx('hdi_2015.xlsx', sheet = 'variables')
 colnames(hdi_df) = cn_df$abbreviations
 ## Clean up data
 hdi_df = hdi_df %>% 
-    select(-contains('HDI'))
+    dplyr::select(-contains('HDI'))
 
 
 imp_var_df = cn_df %>% 
@@ -53,12 +51,12 @@ ui <- fluidPage(
             
         ),
         
-        # Show a plot of the generated distribution
+        ## Display Material
         mainPanel(
             plotOutput("distPlot"),
             tags$b("Compute parameters in R:"),
             verbatimTextOutput("summary"),
-            DTOutput('tbl')
+            reactableOutput("table")
         )
     )
 )
@@ -125,7 +123,7 @@ server <- function(input, output) {
       
       ## Select Based on user input
       hdi_df %>%
-        select(explanatory_variable,response_variable) %>% 
+        dplyr::select(Country, explanatory_variable, response_variable) %>% 
         reactable()
     })
     

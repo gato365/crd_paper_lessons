@@ -5,6 +5,7 @@ library(bslib)
 suppressPackageStartupMessages(library(tidyverse))
 library(readxl)
 library(broom)
+library(gridExtra)
 library(reactable)
 
 
@@ -86,10 +87,10 @@ ui <- fluidPage(
     
     ## Display Material
     mainPanel(
-      plotOutput("distPlot"),
-      tags$b("Compute parameters in R:"),
-      verbatimTextOutput("summary"),
-      reactableOutput("table")
+      plotOutput("distPlot")#,
+      # tags$b("Compute parameters in R:"),
+      # verbatimTextOutput("summary"),
+      # reactableOutput("table")
     )
   )
 )
@@ -101,6 +102,9 @@ server <- function(input, output) {
   inform <- eventReactive(input$button, {
     
     
+    ## Specify the Analysis
+    ta = input$type_analysis
+    
     ## Simple Linear Regression Inputs
     ev_slr = input$explanatory_variable_slr
     rv_slr = input$response_variable_slr
@@ -110,12 +114,16 @@ server <- function(input, output) {
     ev2_mlr = input$explanatory_variable_2_mlr
     rv_mlr = input$response_variable_mlr
     
-    ta = input$type_analysis
     
     
-    return(list(exp_var_slr = ev_slr, 
+    
+    return(list(type_analysis = ta,
+                exp_var_slr = ev_slr, 
                 resp_var_slr = rv_slr,
-                type_analysis = ta))
+                exp_var1_mlr = ev1_mlr, 
+                exp_var2_mlr = ev2_mlr, 
+                resp_var_mlr = rv_mlr
+                ))
   })  
   
   
@@ -142,6 +150,29 @@ server <- function(input, output) {
       explanatory_variable_1 <- inform$exp_var1_mlr
       explanatory_variable_2 <- inform$exp_var2_mlr
       response_variable <- inform$resp_var_mlr 
+      
+      ## Plot Scatter Plot of response and explanatory variable
+      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
+                               y = response_variable)) +
+        geom_point(color = 'red',size = 3) +
+        geom_smooth(method = "lm", se = FALSE)  +
+        labs(x = explanatory_variable_1,
+             y = response_variable,
+             title = paste0("Relationship Data ",explanatory_variable_1," and",response_variable)) +
+        theme_bw() +
+        theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
+              axis.title = element_text(size = 14, face = "bold"))
+      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2, 
+                                      y = response_variable)) +
+        geom_point(color = 'red',size = 3) +
+        geom_smooth(method = "lm", se = FALSE)  +
+        labs(x = explanatory_variable_2,
+             y = response_variable,
+             title = paste0("Relationship Data ",explanatory_variable_2," and",response_variable)) +
+        theme_bw() +
+        theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
+              axis.title = element_text(size = 14, face = "bold"))
+      grid.arrange(p1, p2, ncol=2)
       
     }
     

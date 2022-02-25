@@ -53,12 +53,14 @@ ui <- fluidPage(
         
         selectInput(inputId = 'explanatory_variable_slr',
                     label =  'Explanatory Variable: ',
-                    choices = real_var_names_list
+                    choices = real_var_names_list,
+                    selected =  "Trade_Percent_GDP"
         ),
         
         selectInput(inputId = 'response_variable_slr',
                     label =  'Response Variable: ',
-                    choices = real_var_names_list),
+                    choices = real_var_names_list,
+                    selected =  "Fertility_Rate"),
       ),
       
       ## For Multiple Linear Regression
@@ -66,18 +68,21 @@ ui <- fluidPage(
         condition = 'input.type_analysis == "MLR"',
         selectInput(inputId = 'explanatory_variable_1_mlr',
                     label =  'Explanatory Variable 1: ',
-                    choices = real_var_names_list
+                    choices = real_var_names_list,
+                    selected =  "Trade_Percent_GDP"
         ),
         
         selectInput(inputId = 'explanatory_variable_2_mlr',
                     label =  'Explanatory Variable 2: ',
-                    choices = real_var_names_list
+                    choices = real_var_names_list, 
+                    selected =  "Mean_years_of_schooling"
         ),
         
         
         selectInput('response_variable_mlr',
                     'Response Variable: ',
-                    real_var_names_list),
+                    real_var_names_list,
+                    selected =  "Fertility_Rate"),
       ),
       
       
@@ -142,7 +147,7 @@ server <- function(input, output) {
         geom_smooth(method = "lm", se = FALSE)  +
         labs(x = explanatory_variable,
              y = response_variable,
-             title = paste0("Relationship Data ",explanatory_variable," and",response_variable)) +
+             title = paste0("Relationship Data \n",explanatory_variable," and \n",response_variable)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
@@ -158,7 +163,7 @@ server <- function(input, output) {
         geom_smooth(method = "lm", se = FALSE)  +
         labs(x = explanatory_variable_1,
              y = response_variable,
-             title = paste0("Relationship Data ",explanatory_variable_1," and",response_variable)) +
+             title = paste0("Relationship Data \n",explanatory_variable_1," and \n",response_variable)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
@@ -168,7 +173,7 @@ server <- function(input, output) {
         geom_smooth(method = "lm", se = FALSE)  +
         labs(x = explanatory_variable_2,
              y = response_variable,
-             title = paste0("Relationship Data ",explanatory_variable_2," and",response_variable)) +
+             title = paste0("Relationship Data \n",explanatory_variable_2," and \n",response_variable)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))

@@ -54,6 +54,8 @@ ui <- fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(
+            plotOutput("distPlot"),
+            tags$b("Compute parameters in R:"),
             verbatimTextOutput("summary")
         )
     )
@@ -67,8 +69,29 @@ server <- function(input, output) {
         
         ev = input$explanatory_variable
         rv = input$response_variable
+        
+        
         return(list(exp_var = ev, resp_var = rv))
-    })    
+    })  
+    
+    
+    output$distPlot <- renderPlot({
+        inform <- inform()
+        
+        explanatory_variable <- inform$exp_var
+        response_variable <- inform$resp_var 
+        
+        ggplot(hdi_df,aes_string(x = explanatory_variable, 
+                                    y = response_variable)) +
+            geom_point(color = 'red',size = 3) +
+            geom_smooth(method = "lm", se = FALSE)  +
+            labs(x = explanatory_variable,
+                 y = response_variable,
+                 title = paste0("Relationship Data ",explanatory_variable," and",response_variable)) +
+            theme_bw() +
+            theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
+                  axis.title = element_text(size = 14, face = "bold"))
+    })
 
     
     
@@ -76,8 +99,8 @@ server <- function(input, output) {
     output$summary <- renderPrint({
         inform<-inform()
         
-        explanatory_variable <- inform$exp_var# 'Trade_Percent_GDP'
-        response_variable <- inform$resp_var #'Fertility_Rate'
+        explanatory_variable <- inform$exp_var
+        response_variable <- inform$resp_var 
         
         f <- as.formula(
             paste(response_variable, 
@@ -86,7 +109,7 @@ server <- function(input, output) {
         
         
         
-        tidy(lm(f,data = hdi_df))
+      summary(lm(f,data = hdi_df))
         
     })
     

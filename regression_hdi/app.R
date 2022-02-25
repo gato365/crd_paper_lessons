@@ -38,7 +38,7 @@ ui <- fluidPage(
     
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
-
+        sidebarPanel(
             selectInput('explanatory_variable',
                         'Explanatory Variable: ',
                         real_var_names_list
@@ -54,7 +54,7 @@ ui <- fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(
-            plotOutput("distPlot")
+            verbatimTextOutput("summary")
         )
     )
 )

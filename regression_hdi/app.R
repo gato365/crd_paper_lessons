@@ -97,6 +97,10 @@ ui <- fluidPage(
       br(),
       tags$b("Compute parameters in R:"),
       verbatimTextOutput("summary"),
+      br(),
+      br(),
+      
+      verbatimTextOutput("vif"),
      reactableOutput("table")
     )
   )
@@ -142,14 +146,25 @@ server <- function(input, output) {
       explanatory_variable <- inform$exp_var_slr
       response_variable <- inform$resp_var_slr 
       
+      
+      ## Obtain real variables names
+      tmp_names = cn_df %>% 
+        filter(abbreviations %in% c(explanatory_variable,
+                                    response_variable)) %>% 
+        pull(Variable)
+      
+      exp_var_real = tmp_names[1]
+      res_var_real = tmp_names[2]
+      
       ## Plot Scatter Plot of response and explanatory variable
       ggplot(hdi_df,aes_string(x = explanatory_variable, 
                                y = response_variable)) +
         geom_point(color = 'red',size = 3) +
         geom_smooth(method = "lm", se = FALSE)  +
-        labs(x = explanatory_variable,
-             y = response_variable,
-             title = paste0("Relationship Data \n",explanatory_variable," and \n",response_variable)) +
+        labs(x = exp_var_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var_real," and \n",
+                            res_var_real)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
@@ -158,14 +173,28 @@ server <- function(input, output) {
       explanatory_variable_2 <- inform$exp_var2_mlr
       response_variable <- inform$resp_var_mlr 
       
+      
+      
+      ## Obtain real variables names
+      tmp_names = cn_df %>% 
+        filter(abbreviations %in% c(explanatory_variable_1,
+                                    explanatory_variable_2,
+                                    response_variable)) %>% 
+        pull(Variable)
+      
+      exp_var1_real = tmp_names[1]
+      exp_var2_real = tmp_names[2]
+      res_var_real = tmp_names[3]
+      
+      
       ## Plot Scatter Plot of response and explanatory variable
       p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
                                y = response_variable)) +
         geom_point(color = 'black',size = 3) +
         geom_smooth(method = "lm", se = FALSE,color = 'red')  +
-        labs(x = explanatory_variable_1,
-             y = response_variable,
-             title = paste0("Relationship Data \n",explanatory_variable_1," and \n",response_variable)) +
+        labs(x = exp_var1_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var1_real," and \n",res_var_real)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
@@ -173,9 +202,9 @@ server <- function(input, output) {
                                       y = response_variable)) +
         geom_point(color = 'red',size = 3) +
         geom_smooth(method = "lm", se = FALSE)  +
-        labs(x = explanatory_variable_2,
-             y = response_variable,
-             title = paste0("Relationship Data \n",explanatory_variable_2," and \n",response_variable)) +
+        labs(x = exp_var2_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var2_real," and \n",res_var_real)) +
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
@@ -186,7 +215,35 @@ server <- function(input, output) {
     
   })
   
+
   
+  output$vif <- renderPrint({
+    inform<-inform()
+    
+    if(inform$type_analysis == 'MLR'){
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr
+      explanatory_variable_2 <- inform$exp_var2_mlr
+      response_variable <- inform$resp_var_mlr 
+      
+      
+      ## Formula for Multiple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## Check for multicollinearity
+      car::vif(lm(f,data = hdi_df)) 
+    
+      
+      }
+    
+    
+  })
+  
+    
   output$summary <- renderPrint({
     inform<-inform()
     
@@ -201,6 +258,12 @@ server <- function(input, output) {
       paste(response_variable, 
             paste(explanatory_variable, collapse = " + "), 
             sep = " ~ "))
+    
+    
+    ## Run Regression Model
+    summary(lm(f,data = hdi_df))
+    
+    
     } else {
       
       explanatory_variable_1 <- inform$exp_var1_mlr
@@ -214,12 +277,15 @@ server <- function(input, output) {
               paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
               sep = " ~ "))
       
+   
+      ## Run Regression Model
+      summary(lm(f,data = hdi_df))  
+      
       
     }
     
     
-    ## Run Regression Model
-    summary(lm(f,data = hdi_df))
+   
     
   })
   

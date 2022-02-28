@@ -4,11 +4,11 @@ username:
 account: gato365
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 5744872
-bundleId: 5623744
+appId: 5745120
+bundleId: 5623801
 url: https://gato365.shinyapps.io/regression_hdi/
-when: 1646013624.46204
-lastSyncTime: 1646013624.46204
+when: 1646016339.57422
+lastSyncTime: 1646016339.57422
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: scratch_file_regression.R
+ignoredFiles: hdi_2015.xlsx|scratch_file_regression.R

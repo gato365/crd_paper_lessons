@@ -6,7 +6,7 @@ library(gridExtra)
 library(reactable)
 
 
-setwd("G:/My Drive/03_research_and_development/01_research_topics/paper_0_CRD_main/lesson_plans/crd_paper_lessons/regression_hdi")
+# setwd("G:/My Drive/03_research_and_development/01_research_topics/paper_0_CRD_main/lesson_plans/crd_paper_lessons/regression_hdi")
 ## Bring in data
 # hdi_df = read_xlsx('hdi_2015.xlsx', sheet = 'raw_data') 
 hdi_df = read.csv('hdi_2015_raw_data.csv')
@@ -50,25 +50,30 @@ ui <- fluidPage(
         
         condition = 'input.type_analysis == "SLR"',
         
-        selectInput(inputId = 'explanatory_variable_slr',
-                    label =  'Explanatory Variable: ',
-                    choices = real_var_names_list,
-                    selected =  "Trade_Percent_GDP"
-        ),
         
         selectInput(inputId = 'response_variable_slr',
                     label =  'Response Variable: ',
                     choices = real_var_names_list,
                     selected =  "Fertility_Rate"),
+        selectInput(inputId = 'explanatory_variable_slr',
+                    label =  'Explanatory Variable: ',
+                    choices = real_var_names_list,
+                    selected =  "Young_0_14_per_100_adults_15_64")
+        
+        
       ),
       
       ## For Multiple Linear Regression
       conditionalPanel(
         condition = 'input.type_analysis == "MLR"',
+        selectInput('response_variable_mlr',
+                    'Response Variable: ',
+                    real_var_names_list,
+                    selected =  "Fertility_Rate"),
         selectInput(inputId = 'explanatory_variable_1_mlr',
                     label =  'Explanatory Variable 1: ',
                     choices = real_var_names_list,
-                    selected =  "Trade_Percent_GDP"
+                    selected =  "Young_0_14_per_100_adults_15_64"
         ),
         
         selectInput(inputId = 'explanatory_variable_2_mlr',
@@ -78,14 +83,11 @@ ui <- fluidPage(
         ),
         
         
-        selectInput('response_variable_mlr',
-                    'Response Variable: ',
-                    real_var_names_list,
-                    selected =  "Fertility_Rate"),
+        
       ),
       
       
-      actionButton("button","Calculate")
+      actionButton("button","Display and Calculate")
       
     ),
     
@@ -95,7 +97,7 @@ ui <- fluidPage(
       plotOutput("distPlot"),
       br(),
       br(),
-      tags$h3(tags$b("Compute parameters in R:")),
+      tags$h3(tags$b("Regression Analysis:")),
       verbatimTextOutput("summary"),
       br(),
       br(),

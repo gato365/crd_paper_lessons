@@ -1,18 +1,17 @@
 
 
 library(shiny)
-library(bslib)
 suppressPackageStartupMessages(library(tidyverse))
-library(readxl)
-library(broom)
 library(gridExtra)
 library(reactable)
 
 
 setwd("G:/My Drive/03_research_and_development/01_research_topics/paper_0_CRD_main/lesson_plans/crd_paper_lessons/regression_hdi")
 ## Bring in data
-hdi_df = read_xlsx('hdi_2015.xlsx', sheet = 'raw_data') 
-cn_df = read_xlsx('hdi_2015.xlsx', sheet = 'variables')
+# hdi_df = read_xlsx('hdi_2015.xlsx', sheet = 'raw_data') 
+hdi_df = read.csv('hdi_2015_raw_data.csv')
+# cn_df = read_xlsx('hdi_2015.xlsx', sheet = 'variables')
+cn_df = read.csv('variables_dictionary.csv')
 
 ## Change column names
 colnames(hdi_df) = cn_df$abbreviations
@@ -296,39 +295,39 @@ server <- function(input, output) {
   })
   
   
-  
+
   output$table <- renderReactable({
     inform<-inform()
     if(inform$type_analysis == 'SLR'){
       explanatory_variable <- inform$exp_var_slr
-      response_variable <- inform$resp_var_slr 
-      
+      response_variable <- inform$resp_var_slr
+
       ## Select Based on user input for Simple Linear Regression
       hdi_df %>%
-        dplyr::select(Country, explanatory_variable, response_variable) %>% 
-        reactable()   
-      
+        dplyr::select(Country, explanatory_variable, response_variable) %>%
+        reactable()
+
     } else {
-      
+
       explanatory_variable_1 <- inform$exp_var1_mlr
       explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr 
-      
+      response_variable <- inform$resp_var_mlr
+
       ## Select Based on user input for Multiple Linear Regression
       hdi_df %>%
-        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>% 
-        reactable() 
-      
-      
-      
+        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>%
+        reactable()
+
+
+
     }
-    
-    
-    
-    
+
+
+
+
   })
-  
-  
+
+
   
 }
 

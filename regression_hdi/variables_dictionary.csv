@@ -1,0 +1,25 @@
+Variable,abbreviations,Variable Classification,natural_order,ignore_variables
+Country,Country,,0,1
+HDI Rank,HDI_Rank,,1,1
+Human Development Index (HDI),Human_Development_Index_HDI,,2,1
+Population (millions),Population_millions,Health,3,
+Est Population 2030 (millions),Est_Population_2030_millions,Health,4,
+Life expectancy at birth,Life_expectancy_at_birth,Health,5,
+Expected years of schooling,Expected_years_of_schooling,Education,6,
+Mean years of schooling,Mean_years_of_schooling,Education,7,
+Gross national income (GNI) per capita,Gross_national_income_GNI_per_capita,Standard of Living,8,
+Trade (% GDP),Trade_Percent_GDP,Standard of Living,9,
+Foreign Investment (% GDP),Foreign_Investment_Percent_GDP,Standard of Living,10,
+Net Migration (per 1000),Net_Migration_per_1000,,11,
+Tourists (000s),Tourists_000s,Standard of Living,12,
+Internet Users (%),Internet_Users_Percent,Standard of Living,13,
+Mobile Phone (per 100),Mobile_Phone_per_100,Standard of Living,14,
+HDI rank2,HDI_rank2,,15,1
+Avg Annual Growth (%),Avg_Annual_Growth_Percent,Health,16,
+Urban-(%),Urban_Percent,Standard of Living,17,
+Under age 5-(millions),Under_age_5_millions,Health,18,
+Median age-(years),Median_age_years,Health,19,
+Young (0-14) per 100 adults (15-64),Young_0_14_per_100_adults_15_64,Health,20,
+Old (65 and older)per 100 adults (15-64),Old_65_and_olderper_100_adults_15_64,Health,21,
+Fertility Rate,Fertility_Rate,Health,22,
+Sex ratio at birth-(male to female births),Sex_ratio_at_birth_male_to_female_births,Health,23,

@@ -92,16 +92,22 @@ ui <- fluidPage(
     
     ## Display Material
     mainPanel(
+      tags$h3(tags$b('Visualization:')),
       plotOutput("distPlot"),
       br(),
       br(),
-      tags$b("Compute parameters in R:"),
+      tags$h3(tags$b("Compute parameters in R:")),
       verbatimTextOutput("summary"),
       br(),
       br(),
+      conditionalPanel(
+        condition = "input.type_analysis == 'MLR'",
+        tags$h3(tags$b("VIF:")),
+        verbatimTextOutput("vif")  
+      ),
       
-      verbatimTextOutput("vif"),
-     reactableOutput("table")
+      tags$h3(tags$b('View Table of Selected Variables:')),
+      reactableOutput("table")
     )
   )
 )
@@ -134,7 +140,7 @@ server <- function(input, output) {
                 exp_var1_mlr = ev1_mlr, 
                 exp_var2_mlr = ev2_mlr, 
                 resp_var_mlr = rv_mlr
-                ))
+    ))
   })  
   
   
@@ -189,7 +195,7 @@ server <- function(input, output) {
       
       ## Plot Scatter Plot of response and explanatory variable
       p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
-                               y = response_variable)) +
+                                     y = response_variable)) +
         geom_point(color = 'black',size = 3) +
         geom_smooth(method = "lm", se = FALSE,color = 'red')  +
         labs(x = exp_var1_real,
@@ -215,7 +221,7 @@ server <- function(input, output) {
     
   })
   
-
+  
   
   output$vif <- renderPrint({
     inform<-inform()
@@ -236,34 +242,34 @@ server <- function(input, output) {
       
       ## Check for multicollinearity
       car::vif(lm(f,data = hdi_df)) 
-    
       
-      }
+      
+    }
     
     
   })
   
-    
+  
   output$summary <- renderPrint({
     inform<-inform()
     
     
     if(inform$type_analysis == 'SLR'){
-    explanatory_variable <- inform$exp_var_slr
-    response_variable <- inform$resp_var_slr 
-    
-    
-    ## Formula for Simple Linear Regression
-    f <- as.formula(
-      paste(response_variable, 
-            paste(explanatory_variable, collapse = " + "), 
-            sep = " ~ "))
-    
-    
-    ## Run Regression Model
-    summary(lm(f,data = hdi_df))
-    
-    
+      explanatory_variable <- inform$exp_var_slr
+      response_variable <- inform$resp_var_slr 
+      
+      
+      ## Formula for Simple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(explanatory_variable, collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## Run Regression Model
+      summary(lm(f,data = hdi_df))
+      
+      
     } else {
       
       explanatory_variable_1 <- inform$exp_var1_mlr
@@ -277,7 +283,7 @@ server <- function(input, output) {
               paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
               sep = " ~ "))
       
-   
+      
       ## Run Regression Model
       summary(lm(f,data = hdi_df))  
       
@@ -285,7 +291,7 @@ server <- function(input, output) {
     }
     
     
-   
+    
     
   })
   
@@ -294,28 +300,28 @@ server <- function(input, output) {
   output$table <- renderReactable({
     inform<-inform()
     if(inform$type_analysis == 'SLR'){
-    explanatory_variable <- inform$exp_var_slr
-    response_variable <- inform$resp_var_slr 
-    
-    ## Select Based on user input for Simple Linear Regression
-    hdi_df %>%
-      dplyr::select(Country, explanatory_variable, response_variable) %>% 
-      reactable()   
-    
+      explanatory_variable <- inform$exp_var_slr
+      response_variable <- inform$resp_var_slr 
+      
+      ## Select Based on user input for Simple Linear Regression
+      hdi_df %>%
+        dplyr::select(Country, explanatory_variable, response_variable) %>% 
+        reactable()   
+      
     } else {
-        
-        explanatory_variable_1 <- inform$exp_var1_mlr
-        explanatory_variable_2 <- inform$exp_var2_mlr
-        response_variable <- inform$resp_var_mlr 
-        
-        ## Select Based on user input for Multiple Linear Regression
-        hdi_df %>%
-          dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>% 
-          reactable() 
-        
-        
-        
-      }
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr
+      explanatory_variable_2 <- inform$exp_var2_mlr
+      response_variable <- inform$resp_var_mlr 
+      
+      ## Select Based on user input for Multiple Linear Regression
+      hdi_df %>%
+        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>% 
+        reactable() 
+      
+      
+      
+    }
     
     
     

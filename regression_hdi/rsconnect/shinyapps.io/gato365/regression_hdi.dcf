@@ -1,0 +1,14 @@
+name: regression_hdi
+title: regression_hdi
+username:
+account: gato365
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5743105
+bundleId: 5623659
+url: https://gato365.shinyapps.io/regression_hdi/
+when: 1646009651.08362
+lastSyncTime: 1646009651.08362
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: scratch_file_regression.R

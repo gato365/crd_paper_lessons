@@ -4,6 +4,7 @@ library(shiny)
 suppressPackageStartupMessages(library(tidyverse))
 library(gridExtra)
 library(reactable)
+library(ggfortify)
 
 
 # setwd("G:/My Drive/03_research_and_development/01_research_topics/paper_0_CRD_main/lesson_plans/crd_paper_lessons/regression_hdi")
@@ -94,11 +95,17 @@ ui <- fluidPage(
     ## Display Material
     mainPanel(
       tags$h3(tags$b('Visualization:')),
-      plotOutput("distPlot"),
+      plotOutput("scatter"),
       br(),
       br(),
       tags$h3(tags$b("Regression Analysis:")),
+      br(),
+      br(),
       verbatimTextOutput("summary"),
+      br(),
+      br(),
+      tags$h3(tags$b("Assumptions:")),
+      plotOutput("assume"),
       br(),
       br(),
       conditionalPanel(
@@ -145,7 +152,7 @@ server <- function(input, output) {
   })  
   
   
-  output$distPlot <- renderPlot({
+  output$scatter <- renderPlot({
     inform <- inform()
     
     
@@ -224,6 +231,9 @@ server <- function(input, output) {
   
   
   
+  
+  
+  
   output$vif <- renderPrint({
     inform<-inform()
     
@@ -297,39 +307,87 @@ server <- function(input, output) {
   })
   
   
+  output$assume <- renderPlot({
+    inform<-inform()
+   
+    
+    if(inform$type_analysis == 'SLR'){
+      explanatory_variable <- inform$exp_var_slr
+      response_variable <- inform$resp_var_slr 
+      
+      
+      ## Formula for Simple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(explanatory_variable, collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## View Regression Assumptions
+      point_color = "blue" ## Get Color
+      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+      
+      
+      
+    } else {
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr
+      explanatory_variable_2 <- inform$exp_var2_mlr
+      response_variable <- inform$resp_var_mlr 
+      
+      
+      ## Formula for Multiple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## View Regression Assumptions
+      point_color = "red" ## Get Color
+      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+     
+      
+      
+    }
+    
+    
 
+  })
+  
+  
   output$table <- renderReactable({
     inform<-inform()
     if(inform$type_analysis == 'SLR'){
       explanatory_variable <- inform$exp_var_slr
       response_variable <- inform$resp_var_slr
-
+      
       ## Select Based on user input for Simple Linear Regression
       hdi_df %>%
         dplyr::select(Country, explanatory_variable, response_variable) %>%
         reactable()
-
+      
     } else {
-
+      
       explanatory_variable_1 <- inform$exp_var1_mlr
       explanatory_variable_2 <- inform$exp_var2_mlr
       response_variable <- inform$resp_var_mlr
-
+      
       ## Select Based on user input for Multiple Linear Regression
       hdi_df %>%
         dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>%
         reactable()
-
-
-
+      
+      
+      
     }
-
-
-
-
+    
+    
+    
+    
   })
-
-
+  
+  
   
 }
 

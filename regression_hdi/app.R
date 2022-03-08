@@ -549,15 +549,29 @@ server <- function(input, output) {
         dplyr::select(Country, explanatory_variable, response_variable) %>%
         reactable()
       
-    } else {
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
       
-      explanatory_variable_1 <- inform$exp_var1_mlr
-      explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr
+      explanatory_variable_1 <- inform$exp_var1_mlr_2e
+      explanatory_variable_2 <- inform$exp_var2_mlr_2e
+      response_variable <- inform$resp_var_mlr_2e
       
       ## Select Based on user input for Multiple Linear Regression
       hdi_df %>%
         dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>%
+        reactable()
+      
+      
+      
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr_3e
+      explanatory_variable_2 <- inform$exp_var2_mlr_3e
+      explanatory_variable_3 <- inform$exp_var3_mlr_3e
+      response_variable <- inform$resp_var_mlr_3e
+      
+      ## Select Based on user input for Multiple Linear Regression
+      hdi_df %>%
+        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2,explanatory_variable_3, response_variable) %>%
         reactable()
       
       

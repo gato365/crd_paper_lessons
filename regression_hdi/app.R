@@ -425,11 +425,11 @@ server <- function(input, output) {
       summary(lm(f,data = hdi_df))
       
       
-    } else {
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
       
-      explanatory_variable_1 <- inform$exp_var1_mlr
-      explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr 
+      explanatory_variable_1 <- inform$exp_var1_mlr_2e
+      explanatory_variable_2 <- inform$exp_var2_mlr_2e
+      response_variable <- inform$resp_var_mlr_2e 
       
       
       ## Formula for Multiple Linear Regression
@@ -443,6 +443,25 @@ server <- function(input, output) {
       summary(lm(f,data = hdi_df))  
       
       
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+      explanatory_variable_1 <- inform$exp_var1_mlr_3e
+      explanatory_variable_2 <- inform$exp_var2_mlr_3e
+      explanatory_variable_3 <- inform$exp_var3_mlr_3e
+      response_variable <- inform$resp_var_mlr_3e 
+      
+      
+      ## Formula for Multiple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## Run Regression Model
+      summary(lm(f,data = hdi_df)) 
+    
+      
+        
     }
     
     
@@ -473,11 +492,11 @@ server <- function(input, output) {
       
       
       
-    } else {
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
       
-      explanatory_variable_1 <- inform$exp_var1_mlr
-      explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr 
+      explanatory_variable_1 <- inform$exp_var1_mlr_2e
+      explanatory_variable_2 <- inform$exp_var2_mlr_2e
+      response_variable <- inform$resp_var_mlr_2e 
       
       
       ## Formula for Multiple Linear Regression

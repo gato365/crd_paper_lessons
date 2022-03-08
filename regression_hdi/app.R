@@ -512,6 +512,25 @@ server <- function(input, output) {
      
       
       
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr_3e
+      explanatory_variable_2 <- inform$exp_var2_mlr_3e
+      explanatory_variable_3 <- inform$exp_var3_mlr_3e
+      response_variable <- inform$resp_var_mlr_3e 
+      
+      
+      ## Formula for Multiple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3 ), collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## View Regression Assumptions
+      point_color = "red" ## Get Color
+      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+      
     }
     
     

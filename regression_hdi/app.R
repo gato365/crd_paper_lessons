@@ -78,8 +78,8 @@ ui <- fluidPage(
         ),
         
       ),
-        
-        
+      
+      
       conditionalPanel(
         condition = 'input.type_analysis == "MLR" & input.num_var == "2"',
         selectInput('response_variable_mlr_2e',
@@ -97,7 +97,7 @@ ui <- fluidPage(
                     label =  'Explanatory Variable 2: ',
                     choices = real_var_names_list, 
                     selected =  "Mean_years_of_schooling"),
-  
+        
       ),
       
       conditionalPanel(
@@ -122,7 +122,7 @@ ui <- fluidPage(
         selectInput(inputId = 'explanatory_variable_3_mlr_3e',
                     label =  'Explanatory Variable 3: ',
                     choices = real_var_names_list, 
-                    selected =  "Mean_years_of_schooling"),
+                    selected =  "Life_expectancy_at_birth"),
         
       ),
       
@@ -142,24 +142,24 @@ ui <- fluidPage(
       plotOutput("scatter"),
       br(),
       br(),
-      tags$h3(tags$b("Regression Analysis:")),
+      # tags$h3(tags$b("Regression Analysis:")),
       br(),
       br(),
-      verbatimTextOutput("summary"),
+      # verbatimTextOutput("summary"),
       br(),
       br(),
-      tags$h3(tags$b("Assumptions:")),
-      plotOutput("assume"),
+      # tags$h3(tags$b("Assumptions:")),
+      # plotOutput("assume"),
       br(),
       br(),
-      conditionalPanel(
-        condition = "input.type_analysis == 'MLR'",
-        tags$h3(tags$b("VIF:")),
-        verbatimTextOutput("vif")
-      ),
-
-      tags$h3(tags$b('View Table of Selected Variables:')),
-      reactableOutput("table")
+      # conditionalPanel(
+      #   condition = "input.type_analysis == 'MLR'",
+      #   tags$h3(tags$b("VIF:")),
+      #   verbatimTextOutput("vif")
+      # ),
+      # 
+      # tags$h3(tags$b('View Table of Selected Variables:')),
+      # reactableOutput("table")
     )
   )
 )
@@ -205,32 +205,34 @@ server <- function(input, output) {
                 exp_var1_mlr_3e = ev1_mlr_3e, 
                 exp_var2_mlr_3e = ev2_mlr_3e, 
                 exp_var3_mlr_3e = ev3_mlr_3e,
-                resp_var_mlr_3e = rv_mlr_3e,
-             
+                resp_var_mlr_3e = rv_mlr_3e
+                
     ))
   })  
   
   
+  
   output$scatter <- renderPlot({
+    
+    
+    
     inform <- inform()
+    
+    
+    
     
     
     if(inform$type_analysis == 'SLR'){
       explanatory_variable <- inform$exp_var_slr
-      response_variable <- inform$resp_var_slr 
-      
-      
+      response_variable <- inform$resp_var_slr
+
+
       ## Obtain real variables names
-      tmp_names = cn_df %>% 
-        filter(abbreviations %in% c(explanatory_variable,
-                                    response_variable)) %>% 
-        pull(Variable)
-      
-      exp_var_real = tmp_names[1]
-      res_var_real = tmp_names[2]
-      
+    exp_var_real = str_replace_all(explanatory_variable,'_', ' ') #tmp_names[2]
+    res_var_real = str_replace_all(response_variable,'_', ' ') #tmp_names[3]
+
       ## Plot Scatter Plot of response and explanatory variable
-      ggplot(hdi_df,aes_string(x = explanatory_variable, 
+      ggplot(hdi_df,aes_string(x = explanatory_variable,
                                y = response_variable)) +
         geom_point(color = 'red',size = 3) +
         geom_smooth(method = "lm", se = FALSE)  +
@@ -241,27 +243,22 @@ server <- function(input, output) {
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
+    }
+    else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
       explanatory_variable_1 <- inform$exp_var1_mlr_2e
       explanatory_variable_2 <- inform$exp_var2_mlr_2e
-      response_variable <- inform$resp_var_mlr_2e 
-      
-      
-      
+      response_variable <- inform$resp_var_mlr_2e
+
+
+
       ## Obtain real variables names
-      tmp_names = cn_df %>% 
-        filter(abbreviations %in% c(explanatory_variable_1,
-                                    explanatory_variable_2,
-                                    response_variable)) %>% 
-        pull(Variable)
-      
-      exp_var1_real = tmp_names[1]
-      exp_var2_real = tmp_names[2]
-      res_var_real = tmp_names[3]
-      
-      
+      exp_var1_real = str_replace_all(explanatory_variable_1,'_', ' ') #tmp_names[1]
+      exp_var2_real = str_replace_all(explanatory_variable_2,'_', ' ') #tmp_names[2]
+      res_var_real = str_replace_all(response_variable,'_', ' ') #tmp_names[3]
+
+
       ## Plot Scatter Plot of response and explanatory variable 1
-      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
+      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1,
                                      y = response_variable)) +
         geom_point(color = 'black',size = 3) +
         geom_smooth(method = "lm", se = FALSE,color = 'red')  +
@@ -272,7 +269,7 @@ server <- function(input, output) {
         theme(plot.title = element_text(size = 17, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
       ## Plot Scatter Plot of response and explanatory variable 2
-      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2, 
+      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2,
                                       y = response_variable)) +
         geom_point(color = 'red',size = 3) +
         geom_smooth(method = "lm", se = FALSE)  +
@@ -283,33 +280,28 @@ server <- function(input, output) {
         theme(plot.title = element_text(size = 17, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
       grid.arrange(p1, p2, ncol=2)
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){ ## 3 explanatory variables
-      
-      
+
+    }
+    else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){ ## 3 explanatory variables
+
+
       explanatory_variable_1 <- inform$exp_var1_mlr_3e
       explanatory_variable_2 <- inform$exp_var2_mlr_3e
       explanatory_variable_3 <- inform$exp_var3_mlr_3e
-      response_variable <- inform$resp_var_mlr_3e 
-      
-      
-      
+      response_variable <- inform$resp_var_mlr_3e
+
+
+
       ## Obtain real variables names
-      tmp_names = cn_df %>% 
-        filter(abbreviations %in% c(explanatory_variable_1,
-                                    explanatory_variable_2,
-                                    explanatory_variable_3,
-                                    response_variable)) %>% 
-        pull(Variable)
-      
-      exp_var1_real = tmp_names[1]
-      exp_var2_real = tmp_names[2]
-      exp_var3_real = tmp_names[3]
-      res_var_real = tmp_names[4]
-      
-      
+
+      exp_var1_real = str_replace_all(explanatory_variable_1,'_', ' ') #tmp_names[1]
+      exp_var2_real = str_replace_all(explanatory_variable_2,'_', ' ') #tmp_names[2]
+      exp_var3_real = str_replace_all(explanatory_variable_3,'_', ' ') #tmp_names[2]
+      res_var_real = str_replace_all(response_variable,'_', ' ') #tmp_names[3]
+
+
       ## Plot Scatter Plot of response and explanatory variable 1
-      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
+      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1,
                                      y = response_variable)) +
         geom_point(color = 'black',size = 3) +
         geom_smooth(method = "lm", se = FALSE,color = 'red')  +
@@ -320,7 +312,7 @@ server <- function(input, output) {
         theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 11, face = "bold"))
       ## Plot Scatter Plot of response and explanatory variable 2
-      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2, 
+      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2,
                                       y = response_variable)) +
         geom_point(color = 'red',size = 3) +
         geom_smooth(method = "lm", se = FALSE)  +
@@ -330,260 +322,260 @@ server <- function(input, output) {
         theme_bw() +
         theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 11, face = "bold"))
-      
+
       ## Plot Scatter Plot of response and explanatory variable 3
-      p3 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_3, 
+      p3 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_3,
                                       y = response_variable)) +
-        geom_point(color = 'red',size = 3) +
-        geom_smooth(method = "lm", se = FALSE)  +
+        geom_point(color = 'purple',size = 3) +
+        geom_smooth(method = "lm", se = FALSE, color = 'black')  +
         labs(x = exp_var3_real,
              y = res_var_real,
              title = paste0("Relationship Data \n",exp_var3_real," and \n",res_var_real)) +
         theme_bw() +
         theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 11, face = "bold"))
-      
-      
-      
+
+
+
       grid.arrange(p1, p2, p3, ncol=3)
-      
-      
-      
-      
+
+
+
+
     }
-    
-    
-  })
-  
-  
-  
-  
-  
-  
-  output$vif <- renderPrint({
-    inform<-inform()
-    
-    if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_2e
-      explanatory_variable_2 <- inform$exp_var2_mlr_2e
-      response_variable <- inform$resp_var_mlr_2e 
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## Check for multicollinearity
-      car::vif(lm(f,data = hdi_df)) 
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_3e
-      explanatory_variable_2 <- inform$exp_var2_mlr_3e
-      explanatory_variable_3 <- inform$exp_var3_mlr_3e
-      response_variable <- inform$resp_var_mlr_3e
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## Check for multicollinearity
-      car::vif(lm(f,data = hdi_df))
-      
-    }
-    
-    
-  })
-  
-  
-  output$summary <- renderPrint({
-    inform<-inform()
-    
-    
-    if(inform$type_analysis == 'SLR'){
-      explanatory_variable <- inform$exp_var_slr
-      response_variable <- inform$resp_var_slr 
-      
-      
-      ## Formula for Simple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(explanatory_variable, collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## Run Regression Model
-      summary(lm(f,data = hdi_df))
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_2e
-      explanatory_variable_2 <- inform$exp_var2_mlr_2e
-      response_variable <- inform$resp_var_mlr_2e 
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## Run Regression Model
-      summary(lm(f,data = hdi_df))  
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
-      explanatory_variable_1 <- inform$exp_var1_mlr_3e
-      explanatory_variable_2 <- inform$exp_var2_mlr_3e
-      explanatory_variable_3 <- inform$exp_var3_mlr_3e
-      response_variable <- inform$resp_var_mlr_3e 
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## Run Regression Model
-      summary(lm(f,data = hdi_df)) 
-    
-      
-        
-    }
-    
-    
-    
-    
-  })
-  
-  
-  output$assume <- renderPlot({
-    inform<-inform()
-   
-    
-    if(inform$type_analysis == 'SLR'){
-      explanatory_variable <- inform$exp_var_slr
-      response_variable <- inform$resp_var_slr 
-      
-      
-      ## Formula for Simple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(explanatory_variable, collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## View Regression Assumptions
-      point_color = "blue" ## Get Color
-      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
-      
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_2e
-      explanatory_variable_2 <- inform$exp_var2_mlr_2e
-      response_variable <- inform$resp_var_mlr_2e 
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## View Regression Assumptions
-      point_color = "red" ## Get Color
-      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
-     
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_3e
-      explanatory_variable_2 <- inform$exp_var2_mlr_3e
-      explanatory_variable_3 <- inform$exp_var3_mlr_3e
-      response_variable <- inform$resp_var_mlr_3e 
-      
-      
-      ## Formula for Multiple Linear Regression
-      f <- as.formula(
-        paste(response_variable, 
-              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3 ), collapse = " + "), 
-              sep = " ~ "))
-      
-      
-      ## View Regression Assumptions
-      point_color = "red" ## Get Color
-      autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
-      
-    }
-    
-    
+
 
   })
   
   
-  output$table <- renderReactable({
-    inform<-inform()
-    if(inform$type_analysis == 'SLR'){
-      explanatory_variable <- inform$exp_var_slr
-      response_variable <- inform$resp_var_slr
-      
-      ## Select Based on user input for Simple Linear Regression
-      hdi_df %>%
-        dplyr::select(Country, explanatory_variable, response_variable) %>%
-        reactable()
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_2e
-      explanatory_variable_2 <- inform$exp_var2_mlr_2e
-      response_variable <- inform$resp_var_mlr_2e
-      
-      ## Select Based on user input for Multiple Linear Regression
-      hdi_df %>%
-        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>%
-        reactable()
-      
-      
-      
-    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
-      
-      explanatory_variable_1 <- inform$exp_var1_mlr_3e
-      explanatory_variable_2 <- inform$exp_var2_mlr_3e
-      explanatory_variable_3 <- inform$exp_var3_mlr_3e
-      response_variable <- inform$resp_var_mlr_3e
-      
-      ## Select Based on user input for Multiple Linear Regression
-      hdi_df %>%
-        dplyr::select(Country, explanatory_variable_1,explanatory_variable_2,explanatory_variable_3, response_variable) %>%
-        reactable()
-      
-      
-      
-    }
-    
-    
-    
-    
-  })
   
   
+  
+  
+  # output$vif <- renderPrint({
+  #   inform<-inform()
+  #   
+  #   if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_2e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_2e
+  #     response_variable <- inform$resp_var_mlr_2e 
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## Check for multicollinearity
+  #     car::vif(lm(f,data = hdi_df)) 
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_3e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_3e
+  #     explanatory_variable_3 <- inform$exp_var3_mlr_3e
+  #     response_variable <- inform$resp_var_mlr_3e
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## Check for multicollinearity
+  #     car::vif(lm(f,data = hdi_df))
+  #     
+  #   }
+  #   
+  #   
+  # })
+  # 
+  # 
+  # output$summary <- renderPrint({
+  #   inform<-inform()
+  #   
+  #   
+  #   if(inform$type_analysis == 'SLR'){
+  #     explanatory_variable <- inform$exp_var_slr
+  #     response_variable <- inform$resp_var_slr 
+  #     
+  #     
+  #     ## Formula for Simple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(explanatory_variable, collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## Run Regression Model
+  #     summary(lm(f,data = hdi_df))
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_2e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_2e
+  #     response_variable <- inform$resp_var_mlr_2e 
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## Run Regression Model
+  #     summary(lm(f,data = hdi_df))  
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_3e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_3e
+  #     explanatory_variable_3 <- inform$exp_var3_mlr_3e
+  #     response_variable <- inform$resp_var_mlr_3e 
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## Run Regression Model
+  #     summary(lm(f,data = hdi_df)) 
+  #   
+  #     
+  #       
+  #   }
+  #   
+  #   
+  #   
+  #   
+  # })
+  # 
+  # 
+  # output$assume <- renderPlot({
+  #   inform<-inform()
+  #  
+  #   
+  #   if(inform$type_analysis == 'SLR'){
+  #     explanatory_variable <- inform$exp_var_slr
+  #     response_variable <- inform$resp_var_slr 
+  #     
+  #     
+  #     ## Formula for Simple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(explanatory_variable, collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## View Regression Assumptions
+  #     point_color = "blue" ## Get Color
+  #     autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+  #     
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_2e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_2e
+  #     response_variable <- inform$resp_var_mlr_2e 
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## View Regression Assumptions
+  #     point_color = "red" ## Get Color
+  #     autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+  #    
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_3e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_3e
+  #     explanatory_variable_3 <- inform$exp_var3_mlr_3e
+  #     response_variable <- inform$resp_var_mlr_3e 
+  #     
+  #     
+  #     ## Formula for Multiple Linear Regression
+  #     f <- as.formula(
+  #       paste(response_variable, 
+  #             paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3 ), collapse = " + "), 
+  #             sep = " ~ "))
+  #     
+  #     
+  #     ## View Regression Assumptions
+  #     point_color = "red" ## Get Color
+  #     autoplot(lm(f,data = hdi_df),colour = point_color,which = 1:2)
+  #     
+  #   }
+  #   
+  #   
+  # 
+  # })
+  # 
+  # 
+  # output$table <- renderReactable({
+  #   inform<-inform()
+  #   if(inform$type_analysis == 'SLR'){
+  #     explanatory_variable <- inform$exp_var_slr
+  #     response_variable <- inform$resp_var_slr
+  #     
+  #     ## Select Based on user input for Simple Linear Regression
+  #     hdi_df %>%
+  #       dplyr::select(Country, explanatory_variable, response_variable) %>%
+  #       reactable()
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_2e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_2e
+  #     response_variable <- inform$resp_var_mlr_2e
+  #     
+  #     ## Select Based on user input for Multiple Linear Regression
+  #     hdi_df %>%
+  #       dplyr::select(Country, explanatory_variable_1,explanatory_variable_2, response_variable) %>%
+  #       reactable()
+  #     
+  #     
+  #     
+  #   } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+  #     
+  #     explanatory_variable_1 <- inform$exp_var1_mlr_3e
+  #     explanatory_variable_2 <- inform$exp_var2_mlr_3e
+  #     explanatory_variable_3 <- inform$exp_var3_mlr_3e
+  #     response_variable <- inform$resp_var_mlr_3e
+  #     
+  #     ## Select Based on user input for Multiple Linear Regression
+  #     hdi_df %>%
+  #       dplyr::select(Country, explanatory_variable_1,explanatory_variable_2,explanatory_variable_3, response_variable) %>%
+  #       reactable()
+  #     
+  #     
+  #     
+  #   }
+  #   
+  #   
+  #   
+  #   
+  # })
+  # 
+  # 
   
 }
 

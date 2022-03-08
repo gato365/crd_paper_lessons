@@ -67,25 +67,69 @@ ui <- fluidPage(
       ## For Multiple Linear Regression
       conditionalPanel(
         condition = 'input.type_analysis == "MLR"',
-        selectInput('response_variable_mlr',
+        
+        ## How many explanatory Variables
+        
+        
+        radioButtons(
+          inputId = "num_var",
+          label = "How many explanatory variables?", 
+          choices = c("2", "3")
+        ),
+        
+      ),
+        
+        
+      conditionalPanel(
+        condition = 'input.type_analysis == "MLR" & input.num_var == "2"',
+        selectInput('response_variable_mlr_2e',
                     'Response Variable: ',
                     real_var_names_list,
                     selected =  "Fertility_Rate"),
-        selectInput(inputId = 'explanatory_variable_1_mlr',
+        
+        selectInput(inputId = 'explanatory_variable_1_mlr_2e',
                     label =  'Explanatory Variable 1: ',
                     choices = real_var_names_list,
-                    selected =  "Young_0_14_per_100_adults_15_64"
-        ),
+                    selected =  "Young_0_14_per_100_adults_15_64" ),
         
-        selectInput(inputId = 'explanatory_variable_2_mlr',
+        
+        selectInput(inputId = 'explanatory_variable_2_mlr_2e',
                     label =  'Explanatory Variable 2: ',
                     choices = real_var_names_list, 
-                    selected =  "Mean_years_of_schooling"
-        ),
+                    selected =  "Mean_years_of_schooling"),
+  
+      ),
+      
+      conditionalPanel(
+        condition = 'input.type_analysis == "MLR" & input.num_var == "3"',
+        selectInput('response_variable_mlr_3e',
+                    'Response Variable: ',
+                    real_var_names_list,
+                    selected =  "Fertility_Rate"),
+        
+        selectInput(inputId = 'explanatory_variable_1_mlr_3e',
+                    label =  'Explanatory Variable 1: ',
+                    choices = real_var_names_list,
+                    selected =  "Young_0_14_per_100_adults_15_64"),
         
         
+        selectInput(inputId = 'explanatory_variable_2_mlr_3e',
+                    label =  'Explanatory Variable 2: ',
+                    choices = real_var_names_list, 
+                    selected =  "Mean_years_of_schooling"),
+        
+        
+        selectInput(inputId = 'explanatory_variable_3_mlr_3e',
+                    label =  'Explanatory Variable 3: ',
+                    choices = real_var_names_list, 
+                    selected =  "Mean_years_of_schooling"),
         
       ),
+      
+      
+      
+      
+      
       
       
       actionButton("button","Display and Calculate")

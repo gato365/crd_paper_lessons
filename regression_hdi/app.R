@@ -155,9 +155,9 @@ ui <- fluidPage(
       conditionalPanel(
         condition = "input.type_analysis == 'MLR'",
         tags$h3(tags$b("VIF:")),
-        verbatimTextOutput("vif")  
+        verbatimTextOutput("vif")
       ),
-      
+
       tags$h3(tags$b('View Table of Selected Variables:')),
       reactableOutput("table")
     )
@@ -363,11 +363,11 @@ server <- function(input, output) {
   output$vif <- renderPrint({
     inform<-inform()
     
-    if(inform$type_analysis == 'MLR'){
+    if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2'){
       
-      explanatory_variable_1 <- inform$exp_var1_mlr
-      explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr 
+      explanatory_variable_1 <- inform$exp_var1_mlr_2e
+      explanatory_variable_2 <- inform$exp_var2_mlr_2e
+      response_variable <- inform$resp_var_mlr_2e 
       
       
       ## Formula for Multiple Linear Regression
@@ -380,6 +380,24 @@ server <- function(input, output) {
       ## Check for multicollinearity
       car::vif(lm(f,data = hdi_df)) 
       
+      
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr_3e
+      explanatory_variable_2 <- inform$exp_var2_mlr_3e
+      explanatory_variable_3 <- inform$exp_var3_mlr_3e
+      response_variable <- inform$resp_var_mlr_3e
+      
+      
+      ## Formula for Multiple Linear Regression
+      f <- as.formula(
+        paste(response_variable, 
+              paste(c(explanatory_variable_1,explanatory_variable_2,explanatory_variable_3), collapse = " + "), 
+              sep = " ~ "))
+      
+      
+      ## Check for multicollinearity
+      car::vif(lm(f,data = hdi_df))
       
     }
     

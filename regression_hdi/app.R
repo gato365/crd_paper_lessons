@@ -171,6 +171,7 @@ server <- function(input, output) {
   inform <- eventReactive(input$button, {
     
     
+    
     ## Specify the Analysis
     ta = input$type_analysis
     
@@ -178,20 +179,34 @@ server <- function(input, output) {
     ev_slr = input$explanatory_variable_slr
     rv_slr = input$response_variable_slr
     
-    ## Multiple Linear Regression Inputs
-    ev1_mlr = input$explanatory_variable_1_mlr
-    ev2_mlr = input$explanatory_variable_2_mlr
-    rv_mlr = input$response_variable_mlr
     
+    ## Number of explanatory variables
+    n_e_v = input$num_var
     
+    ## Multiple Linear Regression Inputs 2 explanatory variables
+    ev1_mlr_2e = input$explanatory_variable_1_mlr_2e
+    ev2_mlr_2e = input$explanatory_variable_2_mlr_2e
+    rv_mlr_2e = input$response_variable_mlr_2e
+    
+    ## Multiple Linear Regression Inputs 3 explanatory variables
+    ev1_mlr_3e = input$explanatory_variable_1_mlr_3e
+    ev2_mlr_3e = input$explanatory_variable_2_mlr_3e
+    ev3_mlr_3e = input$explanatory_variable_3_mlr_3e
+    rv_mlr_3e = input$response_variable_mlr_3e    
     
     
     return(list(type_analysis = ta,
+                num_exp_var = n_e_v,
                 exp_var_slr = ev_slr, 
                 resp_var_slr = rv_slr,
-                exp_var1_mlr = ev1_mlr, 
-                exp_var2_mlr = ev2_mlr, 
-                resp_var_mlr = rv_mlr
+                exp_var1_mlr_2e = ev1_mlr_2e, 
+                exp_var2_mlr_2e = ev2_mlr_2e, 
+                resp_var_mlr_2e = rv_mlr_2e,
+                exp_var1_mlr_3e = ev1_mlr_3e, 
+                exp_var2_mlr_3e = ev2_mlr_3e, 
+                exp_var3_mlr_3e = ev3_mlr_3e,
+                resp_var_mlr_3e = rv_mlr_3e,
+             
     ))
   })  
   
@@ -226,10 +241,10 @@ server <- function(input, output) {
         theme_bw() +
         theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
-    } else {
-      explanatory_variable_1 <- inform$exp_var1_mlr
-      explanatory_variable_2 <- inform$exp_var2_mlr
-      response_variable <- inform$resp_var_mlr 
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '2') {
+      explanatory_variable_1 <- inform$exp_var1_mlr_2e
+      explanatory_variable_2 <- inform$exp_var2_mlr_2e
+      response_variable <- inform$resp_var_mlr_2e 
       
       
       
@@ -245,7 +260,7 @@ server <- function(input, output) {
       res_var_real = tmp_names[3]
       
       
-      ## Plot Scatter Plot of response and explanatory variable
+      ## Plot Scatter Plot of response and explanatory variable 1
       p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
                                      y = response_variable)) +
         geom_point(color = 'black',size = 3) +
@@ -254,8 +269,9 @@ server <- function(input, output) {
              y = res_var_real,
              title = paste0("Relationship Data \n",exp_var1_real," and \n",res_var_real)) +
         theme_bw() +
-        theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
+        theme(plot.title = element_text(size = 17, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
+      ## Plot Scatter Plot of response and explanatory variable 2
       p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2, 
                                       y = response_variable)) +
         geom_point(color = 'red',size = 3) +
@@ -264,9 +280,75 @@ server <- function(input, output) {
              y = res_var_real,
              title = paste0("Relationship Data \n",exp_var2_real," and \n",res_var_real)) +
         theme_bw() +
-        theme(plot.title = element_text(size = 19, hjust = 0.5, face = "bold"),
+        theme(plot.title = element_text(size = 17, hjust = 0.5, face = "bold"),
               axis.title = element_text(size = 14, face = "bold"))
       grid.arrange(p1, p2, ncol=2)
+      
+    } else if(inform$type_analysis == 'MLR' & inform$num_exp_var == '3'){ ## 3 explanatory variables
+      
+      
+      explanatory_variable_1 <- inform$exp_var1_mlr_3e
+      explanatory_variable_2 <- inform$exp_var2_mlr_3e
+      explanatory_variable_3 <- inform$exp_var3_mlr_3e
+      response_variable <- inform$resp_var_mlr_3e 
+      
+      
+      
+      ## Obtain real variables names
+      tmp_names = cn_df %>% 
+        filter(abbreviations %in% c(explanatory_variable_1,
+                                    explanatory_variable_2,
+                                    explanatory_variable_3,
+                                    response_variable)) %>% 
+        pull(Variable)
+      
+      exp_var1_real = tmp_names[1]
+      exp_var2_real = tmp_names[2]
+      exp_var3_real = tmp_names[3]
+      res_var_real = tmp_names[4]
+      
+      
+      ## Plot Scatter Plot of response and explanatory variable 1
+      p1 <- ggplot(hdi_df,aes_string(x = explanatory_variable_1, 
+                                     y = response_variable)) +
+        geom_point(color = 'black',size = 3) +
+        geom_smooth(method = "lm", se = FALSE,color = 'red')  +
+        labs(x = exp_var1_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var1_real," and \n",res_var_real)) +
+        theme_bw() +
+        theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+              axis.title = element_text(size = 11, face = "bold"))
+      ## Plot Scatter Plot of response and explanatory variable 2
+      p2 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_2, 
+                                      y = response_variable)) +
+        geom_point(color = 'red',size = 3) +
+        geom_smooth(method = "lm", se = FALSE)  +
+        labs(x = exp_var2_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var2_real," and \n",res_var_real)) +
+        theme_bw() +
+        theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+              axis.title = element_text(size = 11, face = "bold"))
+      
+      ## Plot Scatter Plot of response and explanatory variable 3
+      p3 <-  ggplot(hdi_df,aes_string(x = explanatory_variable_3, 
+                                      y = response_variable)) +
+        geom_point(color = 'red',size = 3) +
+        geom_smooth(method = "lm", se = FALSE)  +
+        labs(x = exp_var3_real,
+             y = res_var_real,
+             title = paste0("Relationship Data \n",exp_var3_real," and \n",res_var_real)) +
+        theme_bw() +
+        theme(plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+              axis.title = element_text(size = 11, face = "bold"))
+      
+      
+      
+      grid.arrange(p1, p2, p3, ncol=3)
+      
+      
+      
       
     }
     

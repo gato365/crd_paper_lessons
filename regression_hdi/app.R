@@ -53,7 +53,7 @@ ui <- fluidPage(
         
         
         selectInput(inputId = 'response_variable_slr',
-                    label =  'Response Variable: ',
+                    span('Response Variable: ',style="color:red"),
                     choices = real_var_names_list,
                     selected =  "Fertility_Rate"),
         selectInput(inputId = 'explanatory_variable_slr',
@@ -73,7 +73,7 @@ ui <- fluidPage(
         
         radioButtons(
           inputId = "num_var",
-          label = "How many explanatory variables?", 
+          label = span("How many explanatory variables?",style="color:green"), 
           choices = c("2", "3")
         ),
         
@@ -83,7 +83,7 @@ ui <- fluidPage(
       conditionalPanel(
         condition = 'input.type_analysis == "MLR" & input.num_var == "2"',
         selectInput('response_variable_mlr_2e',
-                    'Response Variable: ',
+                    span('Response Variable: ',style="color:red"),
                     real_var_names_list,
                     selected =  "Fertility_Rate"),
         
@@ -103,7 +103,7 @@ ui <- fluidPage(
       conditionalPanel(
         condition = 'input.type_analysis == "MLR" & input.num_var == "3"',
         selectInput('response_variable_mlr_3e',
-                    'Response Variable: ',
+                    span('Response Variable: ',style="color:red"), 
                     real_var_names_list,
                     selected =  "Fertility_Rate"),
         
